@@ -1,0 +1,97 @@
+{
+  "entities": {
+    "UserPreferences": {
+      "title": "UserPreferences",
+      "description": "MYRA AI Assistant user preferences for voice orb style, language, speech, and haptics.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Authenticated user UID." },
+        "orbStyle": { "type": "string", "enum": ["classic", "energy", "neon"], "description": "Active MYRA voice orb visual style." },
+        "language": { "type": "string", "enum": ["auto", "en", "hi", "hinglish", "ta", "es", "ja"], "description": "Preferred interaction language." },
+        "autoSpeak": { "type": "boolean", "description": "Whether MYRA automatically speaks replies via TTS." },
+        "hapticsEnabled": { "type": "boolean", "description": "Whether haptic feedback is enabled on voice/orb interactions." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp of last update (FieldValue.serverTimestamp())." }
+      },
+      "required": ["userId", "orbStyle", "language", "autoSpeak", "hapticsEnabled", "updatedAt"]
+    },
+    "ChatSession": {
+      "title": "ChatSession",
+      "description": "A multi-turn MYRA AI Assistant conversation session.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner user UID." },
+        "title": { "type": "string", "description": "Conversation title." },
+        "lastMessagePreview": { "type": "string", "description": "Short preview of the latest message." },
+        "language": { "type": "string", "description": "Session language code." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server creation timestamp (FieldValue.serverTimestamp())." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server update timestamp (FieldValue.serverTimestamp())." }
+      },
+      "required": ["userId", "title", "lastMessagePreview", "language", "createdAt", "updatedAt"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "A single message within a MYRA AI chat session.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner user UID." },
+        "role": { "type": "string", "enum": ["user", "model"], "description": "Sender role." },
+        "content": { "type": "string", "description": "Message text content." },
+        "actionLabel": { "type": "string", "description": "Optional quick action button label." },
+        "actionType": { "type": "string", "description": "Optional quick action type (timer, search, email, url, dial, settings)." },
+        "actionQuery": { "type": "string", "description": "Optional payload or query for the quick action." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server creation timestamp (FieldValue.serverTimestamp())." }
+      },
+      "required": ["userId", "role", "content", "createdAt"]
+    },
+    "MemoryNote": {
+      "title": "MemoryNote",
+      "description": "Persistent personal fact or preference remembered by MYRA across sessions.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner user UID." },
+        "content": { "type": "string", "description": "Memory fact text." },
+        "category": { "type": "string", "enum": ["personal", "preference", "work", "general"], "description": "Memory category." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server creation timestamp (FieldValue.serverTimestamp())." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server update timestamp (FieldValue.serverTimestamp())." }
+      },
+      "required": ["userId", "content", "category", "createdAt", "updatedAt"]
+    },
+    "AutomationWorkflow": {
+      "title": "AutomationWorkflow",
+      "description": "Reusable MYRA AI automation command or routine.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner user UID." },
+        "title": { "type": "string", "description": "Workflow title." },
+        "triggerPhrase": { "type": "string", "description": "Voice or text trigger phrase." },
+        "promptTemplate": { "type": "string", "description": "Prompt executed by MYRA AI." },
+        "category": { "type": "string", "enum": ["briefing", "productivity", "coding", "translate"], "description": "Workflow category." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server creation timestamp (FieldValue.serverTimestamp())." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server update timestamp (FieldValue.serverTimestamp())." }
+      },
+      "required": ["userId", "title", "triggerPhrase", "promptTemplate", "category", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/preferences/{configId}": {
+      "schema": { "$ref": "#/entities/UserPreferences" },
+      "description": "User assistant preferences document (config)."
+    },
+    "/users/{userId}/sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/ChatSession" },
+      "description": "User conversation sessions."
+    },
+    "/users/{userId}/sessions/{sessionId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/ChatMessage" },
+      "description": "Messages belonging to a user conversation session."
+    },
+    "/users/{userId}/memories/{memoryId}": {
+      "schema": { "$ref": "#/entities/MemoryNote" },
+      "description": "User personal memory notes for MYRA AI."
+    },
+    "/users/{userId}/automations/{automationId}": {
+      "schema": { "$ref": "#/entities/AutomationWorkflow" },
+      "description": "User custom AI automation workflows."
+    }
+  }
+}

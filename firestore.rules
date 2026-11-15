@@ -1,0 +1,197 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidUserPreferences(data, userId) {
+      return data.userId is string &&
+             data.userId == userId &&
+             data.userId.size() <= 128 &&
+             data.orbStyle is string &&
+             data.orbStyle in ['classic', 'energy', 'neon'] &&
+             data.language is string &&
+             data.language in ['auto', 'en', 'hi', 'hinglish', 'ta', 'es', 'ja'] &&
+             data.autoSpeak is bool &&
+             data.hapticsEnabled is bool &&
+             data.updatedAt is timestamp &&
+             data.updatedAt <= request.time;
+    }
+
+    function isValidChatSession(data, userId) {
+      return data.userId is string &&
+             data.userId == userId &&
+             data.userId.size() <= 128 &&
+             data.title is string &&
+             data.title.size() >= 1 &&
+             data.title.size() <= 120 &&
+             data.lastMessagePreview is string &&
+             data.lastMessagePreview.size() <= 300 &&
+             data.language is string &&
+             data.language.size() >= 1 &&
+             data.language.size() <= 24 &&
+             data.createdAt is timestamp &&
+             data.createdAt <= request.time &&
+             data.updatedAt is timestamp &&
+             data.updatedAt <= request.time;
+    }
+
+    function isValidChatMessage(data, userId) {
+      return data.userId is string &&
+             data.userId == userId &&
+             data.userId.size() <= 128 &&
+             data.role is string &&
+             data.role in ['user', 'model'] &&
+             data.content is string &&
+             data.content.size() >= 1 &&
+             data.content.size() <= 20000 &&
+             (!('actionLabel' in data) || (data.actionLabel is string && data.actionLabel.size() <= 80)) &&
+             (!('actionType' in data) || (data.actionType is string && data.actionType.size() <= 40)) &&
+             (!('actionQuery' in data) || (data.actionQuery is string && data.actionQuery.size() <= 300)) &&
+             data.createdAt is timestamp &&
+             data.createdAt <= request.time;
+    }
+
+    function isValidMemoryNote(data, userId) {
+      return data.userId is string &&
+             data.userId == userId &&
+             data.userId.size() <= 128 &&
+             data.content is string &&
+             data.content.size() >= 1 &&
+             data.content.size() <= 500 &&
+             data.category is string &&
+             data.category in ['personal', 'preference', 'work', 'general'] &&
+             data.createdAt is timestamp &&
+             data.createdAt <= request.time &&
+             data.updatedAt is timestamp &&
+             data.updatedAt <= request.time;
+    }
+
+    function isValidAutomationWorkflow(data, userId) {
+      return data.userId is string &&
+             data.userId == userId &&
+             data.userId.size() <= 128 &&
+             data.title is string &&
+             data.title.size() >= 1 &&
+             data.title.size() <= 80 &&
+             data.triggerPhrase is string &&
+             data.triggerPhrase.size() >= 1 &&
+             data.triggerPhrase.size() <= 80 &&
+             data.promptTemplate is string &&
+             data.promptTemplate.size() >= 1 &&
+             data.promptTemplate.size() <= 2000 &&
+             data.category is string &&
+             data.category in ['briefing', 'productivity', 'coding', 'translate'] &&
+             data.createdAt is timestamp &&
+             data.createdAt <= request.time &&
+             data.updatedAt is timestamp &&
+             data.updatedAt <= request.time;
+    }
+
+    match /users/{userId} {
+      match /preferences/{configId} {
+        allow get: if isOwner(userId) && isValidId(configId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+                         isValidId(configId) &&
+                         incoming().keys().hasAll(['userId', 'orbStyle', 'language', 'autoSpeak', 'hapticsEnabled', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'orbStyle', 'language', 'autoSpeak', 'hapticsEnabled', 'updatedAt']) &&
+                         isValidUserPreferences(incoming(), userId);
+        allow update: if isOwner(userId) &&
+                         isValidId(configId) &&
+                         isValidUserPreferences(incoming(), userId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['orbStyle', 'language', 'autoSpeak', 'hapticsEnabled', 'updatedAt']);
+        allow delete: if isOwner(userId) && isValidId(configId);
+      }
+
+      match /sessions/{sessionId} {
+        allow get: if isOwner(userId) && isValidId(sessionId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+                         isValidId(sessionId) &&
+                         incoming().keys().hasAll(['userId', 'title', 'lastMessagePreview', 'language', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'title', 'lastMessagePreview', 'language', 'createdAt', 'updatedAt']) &&
+                         isValidChatSession(incoming(), userId);
+        allow update: if isOwner(userId) &&
+                         isValidId(sessionId) &&
+                         isValidChatSession(incoming(), userId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['title', 'lastMessagePreview', 'language', 'updatedAt']);
+        allow delete: if isOwner(userId) && isValidId(sessionId);
+
+        match /messages/{messageId} {
+          allow get: if isOwner(userId) && isValidId(sessionId) && isValidId(messageId);
+          allow list: if isOwner(userId) && isValidId(sessionId);
+          allow create: if isOwner(userId) &&
+                           isValidId(sessionId) &&
+                           isValidId(messageId) &&
+                           incoming().keys().hasAll(['userId', 'role', 'content', 'createdAt']) &&
+                           incoming().keys().hasOnly(['userId', 'role', 'content', 'actionLabel', 'actionType', 'actionQuery', 'createdAt']) &&
+                           isValidChatMessage(incoming(), userId) &&
+                           (exists(/databases/$(database)/documents/users/$(userId)/sessions/$(sessionId)) ||
+                            existsAfter(/databases/$(database)/documents/users/$(userId)/sessions/$(sessionId)));
+          allow update: if false;
+          allow delete: if isOwner(userId) && isValidId(sessionId) && isValidId(messageId);
+        }
+      }
+
+      match /memories/{memoryId} {
+        allow get: if isOwner(userId) && isValidId(memoryId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+                         isValidId(memoryId) &&
+                         incoming().keys().hasAll(['userId', 'content', 'category', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'content', 'category', 'createdAt', 'updatedAt']) &&
+                         isValidMemoryNote(incoming(), userId);
+        allow update: if isOwner(userId) &&
+                         isValidId(memoryId) &&
+                         isValidMemoryNote(incoming(), userId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['content', 'category', 'updatedAt']);
+        allow delete: if isOwner(userId) && isValidId(memoryId);
+      }
+
+      match /automations/{automationId} {
+        allow get: if isOwner(userId) && isValidId(automationId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+                         isValidId(automationId) &&
+                         incoming().keys().hasAll(['userId', 'title', 'triggerPhrase', 'promptTemplate', 'category', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'title', 'triggerPhrase', 'promptTemplate', 'category', 'createdAt', 'updatedAt']) &&
+                         isValidAutomationWorkflow(incoming(), userId);
+        allow update: if isOwner(userId) &&
+                         isValidId(automationId) &&
+                         isValidAutomationWorkflow(incoming(), userId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['title', 'triggerPhrase', 'promptTemplate', 'category', 'updatedAt']);
+        allow delete: if isOwner(userId) && isValidId(automationId);
+      }
+    }
+  }
+}

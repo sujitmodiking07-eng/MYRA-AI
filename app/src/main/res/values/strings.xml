@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">MYRA AI</string>
+    <string name="tagline_myra">Multilingual Voice, Vision &amp; Automation AI</string>
+    <string name="sign_in_google">Sign in with Google</string>
+    <string name="nav_assistant">Assistant</string>
+    <string name="nav_chat">Chat</string>
+    <string name="nav_vision">Vision</string>
+    <string name="nav_automate">Automate</string>
+    <string name="nav_memory">Memory</string>
+    <string name="chat_screen_title">Gemini Chat</string>
+    <string name="chat_input_placeholder">Message Gemini…</string>
+    <string name="ask_myra_hint">Ask MYRA anything in any language…</string>
+    <string name="mic_listening">Listening… speak naturally</string>
+    <string name="mic_permission_needed">Microphone permission is required for voice commands.</string>
+</resources>
