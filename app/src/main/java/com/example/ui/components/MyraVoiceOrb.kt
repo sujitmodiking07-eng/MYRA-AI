@@ -98,19 +98,14 @@ fun MyraVoiceOrb(
         ),
         label = "orb_rotation"
     )
-
     val primaryColor = when (visualState) {
-        OrbVisualState.LISTENING -> MyraEmerald
-        OrbVisualState.SPEAKING -> MyraCyan
-        OrbVisualState.THINKING -> MyraViolet
-        OrbVisualState.IDLE -> MyraCyan
+        OrbVisualState.LISTENING -> Color(0xFFFFD700)
+        OrbVisualState.SPEAKING -> Color(0xFFFFC247)
+        OrbVisualState.THINKING -> Color(0xFFFFA500)
+        OrbVisualState.IDLE -> Color(0xFFFFD700)
     }
-    val secondaryColor = when (orbStyle) {
-        OrbStyle.CLASSIC -> MyraCyan.copy(alpha = 0.7f)
-        OrbStyle.ENERGY -> MyraViolet
-        OrbStyle.NEON -> Color(0xFF38BDF8)
-    }
-
+    val secondaryColor = Color(0xFFB8860B)
+    
     val stateLabel = when (visualState) {
         OrbVisualState.IDLE -> "Tap MYRA voice orb to speak"
         OrbVisualState.LISTENING -> "MYRA is listening, tap to stop"
