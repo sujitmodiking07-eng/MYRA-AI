@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1019489145949",
+    "project_id": "myra-ai-5de48",
+    "storage_bucket": "myra-ai-5de48.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1019489145949:android:1bbe61f4da028da76169b4",
+        "android_client_info": {
+          "package_name": "com.aistudio.myraassistant.vqrzkm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCb1ij3dnnSQbZg977pEEyGvQ2FiPvWbNQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
