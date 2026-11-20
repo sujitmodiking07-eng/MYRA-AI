@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "307849005643",
+    "project_id": "myra-ai-8d51f",
+    "storage_bucket": "myra-ai-8d51f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:307849005643:android:66c6d078a032a2f3885bce",
+        "android_client_info": {
+          "package_name": "com.aistudio.myraassistant.vqrzkm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "307849005643-chqhvnupndt7iol4b2949luct994q45t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aistudio.myraassistant.vqrzkm",
+            "certificate_hash": "84deb686f68e935b925b64a6c07a14630bfa7c8b"
+          }
+        },
+        {
+          "client_id": "307849005643-g8it5h8t8sphon5n6t9gbbq49543q3fm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCs2JjNyzLHcBHZlrhQrGQMTgxfO7mMgIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "307849005643-g8it5h8t8sphon5n6t9gbbq49543q3fm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
